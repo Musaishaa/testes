@@ -2,133 +2,658 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Generator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatGPT Interface</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+:root {
+    --bg: #212121;
+    --sidebar: #171717;
+    --surface: #2f2f2f;
+    --surface-hover: #3a3a3a;
+    --text: #ececec;
+    --muted: #a0a0a0;
+    --border: #414141;
+    --accent: #10a37f;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #101827, #243b55);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+body.light {
+    --bg: #ffffff;
+    --sidebar: #f9f9f9;
+    --surface: #f4f4f4;
+    --surface-hover: #e9e9e9;
+    --text: #222222;
+    --muted: #777777;
+    --border: #dddddd;
+    --accent: #0d8c70;
+}
 
-        .container {
-            background: rgba(255,255,255,0.08);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        h1 {
-            margin-bottom: 10px;
-        }
+body {
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    transition: background .2s, color .2s;
+}
 
-        p {
-            color: #b8c5d6;
-            margin-bottom: 25px;
-        }
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--sidebar);
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    transition: margin-left .25s;
+}
 
-        .result {
-            font-size: 35px;
-            font-weight: bold;
-            padding: 25px;
-            margin-bottom: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            overflow-wrap: anywhere;
-        }
+.sidebar.hidden {
+    margin-left: -260px;
+}
 
-        button {
-            padding: 13px 25px;
-            border: none;
-            border-radius: 10px;
-            background: #38bdf8;
-            color: #102030;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
 
-        button:hover {
-            background: #0ea5e9;
-            transform: scale(1.05);
-        }
+.logo {
+    font-size: 21px;
+    font-weight: bold;
+    letter-spacing: -.8px;
+}
 
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
-            color: #8da2bb;
-        }
-    </style>
+.icon-button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.icon-button:hover {
+    background: var(--surface-hover);
+}
+
+.new-chat {
+    width: 100%;
+    text-align: left;
+    padding: 12px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.new-chat:hover {
+    background: var(--surface-hover);
+}
+
+.section-title {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 8px 5px;
+}
+
+.history {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 11px;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item:hover {
+    background: var(--surface-hover);
+}
+
+.sidebar-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.avatar {
+    width: 33px;
+    height: 33px;
+    background: #16866d;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.topbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.top-title {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.model {
+    font-size: 13px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 12px;
+}
+
+.top-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* CHAT AREA */
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 20px 170px;
+}
+
+.welcome {
+    max-width: 750px;
+    margin: 12vh auto 0;
+    text-align: center;
+}
+
+.welcome h1 {
+    font-size: 30px;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.suggestions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    text-align: left;
+}
+
+.suggestion {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 13px;
+    padding: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: .2s;
+}
+
+.suggestion:hover {
+    background: var(--surface);
+}
+
+.suggestion strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.suggestion span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* MESSAGES */
+.messages {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.message {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    line-height: 1.7;
+    font-size: 15px;
+    animation: appear .25s ease;
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.user .message-content {
+    background: var(--surface);
+    padding: 12px 17px;
+    border-radius: 20px;
+    max-width: 80%;
+}
+
+.message.bot .message-content {
+    flex: 1;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.bot-avatar {
+    min-width: 30px;
+    height: 30px;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 16px;
+}
+
+/* COMPOSER */
+.composer-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    background: linear-gradient(
+        transparent,
+        var(--bg) 20%
+    );
+}
+
+.composer {
+    max-width: 760px;
+    margin: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    box-shadow: 0 5px 25px rgba(0,0,0,.1);
+}
+
+.composer textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    max-height: 160px;
+    padding: 8px 0;
+}
+
+.composer textarea::placeholder {
+    color: var(--muted);
+}
+
+.send-button {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #171717;
+    cursor: pointer;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.send-button:hover {
+    background: #dcdcdc;
+}
+
+.send-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.disclaimer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 12px;
+}
+
+/* MOBILE */
+@media(max-width: 700px) {
+    .sidebar {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        box-shadow: 10px 0 30px rgba(0,0,0,.2);
+    }
+
+    .sidebar.hidden {
+        margin-left: -260px;
+    }
+
+    .welcome {
+        margin-top: 10vh;
+    }
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+
+    .suggestions {
+        grid-template-columns: 1fr;
+    }
+
+    .chat-area {
+        padding: 15px 12px 160px;
+    }
+
+    .composer-wrapper {
+        padding: 12px;
+    }
+
+    .model {
+        display: none;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>Random Generator</h1>
-        <p>Klik tombol untuk menghasilkan sesuatu secara acak!</p>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+        <div class="logo">ChatGPT</div>
+        <button class="icon-button" onclick="toggleSidebar()" title="Tutup sidebar">☰</button>
+    </div>
 
-        <div class="result" id="result">?</div>
+    <button class="new-chat" onclick="newChat()">＋ New chat</button>
 
-        <button onclick="randomNumber()">Random Angka</button>
-        <button onclick="randomColor()">Random Warna</button>
-        <button onclick="randomWord()">Random Kata</button>
+    <div class="section-title">Recent</div>
+    <div class="history" id="history"></div>
 
-        <div class="footer">
-            Created with HTML, CSS & JavaScript
+    <div class="sidebar-bottom">
+        <div class="profile">
+            <div class="avatar">U</div>
+            <div>
+                <strong>User</strong>
+                <div style="font-size:11px;color:var(--muted)">Personal Account</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+    <header class="topbar">
+        <div class="top-left">
+            <button class="icon-button" onclick="toggleSidebar()" title="Sidebar">☰</button>
+            <div class="top-title">ChatGPT</div>
+            <div class="model">Model Demo</div>
+        </div>
+
+        <div class="top-actions">
+            <button class="icon-button" onclick="toggleTheme()" title="Ganti tema">◐</button>
+            <button class="icon-button" onclick="newChat()" title="New Chat">＋</button>
+        </div>
+    </header>
+
+    <!-- CHAT -->
+    <section class="chat-area" id="chatArea">
+
+        <div class="welcome" id="welcome">
+            <h1>What can I help with?</h1>
+
+            <div class="suggestions">
+                <button class="suggestion" onclick="useSuggestion('Bantu saya membuat website HTML')">
+                    <strong>✦ Create a website</strong>
+                    <span>Buat website dengan HTML, CSS, dan JavaScript</span>
+                </button>
+
+                <button class="suggestion" onclick="useSuggestion('Jelaskan tentang Artificial Intelligence')">
+                    <strong>◈ Learn something</strong>
+                    <span>Pelajari hal baru dan menarik</span>
+                </button>
+
+                <button class="suggestion" onclick="useSuggestion('Buatkan ide proyek teknologi')">
+                    <strong>⌘ Brainstorm ideas</strong>
+                    <span>Temukan ide dan inspirasi baru</span>
+                </button>
+
+                <button class="suggestion" onclick="useSuggestion('Buatkan contoh kode Python sederhana')">
+                    <strong>⌨ Write some code</strong>
+                    <span>Buat dan pelajari kode pemrograman</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+    </section>
+
+    <!-- INPUT -->
+    <div class="composer-wrapper">
+        <div class="composer">
+            <textarea
+                id="prompt"
+                rows="1"
+                placeholder="Message ChatGPT..."
+                onkeydown="handleKey(event)"
+                oninput="resizeInput(this)"
+            ></textarea>
+
+            <button class="send-button" id="sendBtn" onclick="sendMessage()">↑</button>
+        </div>
+
+        <div class="disclaimer">
+            ChatGPT Demo Interface. Responses are simulated and may be inaccurate.
         </div>
     </div>
 
-    <script>
-        function randomNumber() {
-            let number = Math.floor(Math.random() * 1000) + 1;
-            document.getElementById("result").innerText = number;
-        }
+</main>
 
-        function randomColor() {
-            let color = "#" + Math.floor(
-                Math.random() * 16777215
-            ).toString(16).padStart(6, "0");
+<script>
+const input = document.getElementById("prompt");
+const messages = document.getElementById("messages");
+const welcome = document.getElementById("welcome");
+const chatArea = document.getElementById("chatArea");
+const sendBtn = document.getElementById("sendBtn");
 
-            document.getElementById("result").innerText = color;
-            document.querySelector(".container").style.background = color;
-        }
+let chatHistory = [];
+let isWaiting = false;
 
-        function randomWord() {
-            let words = [
-                "Ascendant",
-                "Sovereign",
-                "Eternal",
-                "Mystic",
-                "Legend",
-                "Infinity",
-                "Dominion",
-                "Imperium",
-                "Aeternum",
-                "Invictus"
-            ];
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("hidden");
+}
 
-            let word = words[Math.floor(Math.random() * words.length)];
+function toggleTheme() {
+    document.body.classList.toggle("light");
+}
 
-            document.getElementById("result").innerText = word;
-        }
-    </script>
+function resizeInput(element) {
+    element.style.height = "auto";
+    element.style.height = Math.min(element.scrollHeight, 160) + "px";
+}
+
+function handleKey(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+function useSuggestion(text) {
+    input.value = text;
+    sendMessage();
+}
+
+function addMessage(text, type) {
+    const message = document.createElement("div");
+    message.className = "message " + type;
+
+    if (type === "bot") {
+        const avatar = document.createElement("div");
+        avatar.className = "bot-avatar";
+        avatar.textContent = "✳";
+
+        const content = document.createElement("div");
+        content.className = "message-content";
+        content.textContent = text;
+
+        message.appendChild(avatar);
+        message.appendChild(content);
+    } else {
+        const content = document.createElement("div");
+        content.className = "message-content";
+        content.textContent = text;
+        message.appendChild(content);
+    }
+
+    messages.appendChild(message);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    return message;
+}
+
+function generateResponse(text) {
+    const lower = text.toLowerCase();
+
+    if (lower.includes("halo") || lower.includes("hai")) {
+        return "Halo! Senang bertemu denganmu. Ada yang bisa saya bantu hari ini?";
+    }
+
+    if (lower.includes("html") || lower.includes("website")) {
+        return "HTML merupakan bahasa markup yang digunakan untuk membuat struktur halaman website.\\n\\nKamu bisa menggabungkannya dengan CSS untuk desain dan JavaScript untuk membuat website menjadi interaktif.";
+    }
+
+    if (lower.includes("python")) {
+        return "Python adalah bahasa pemrograman yang populer karena sintaksnya sederhana dan mudah dipelajari.\\n\\nPython banyak digunakan untuk automasi, analisis data, pengembangan web, dan Artificial Intelligence.";
+    }
+
+    if (lower.includes("ai") || lower.includes("artificial intelligence")) {
+        return "Artificial Intelligence (AI) adalah teknologi yang memungkinkan komputer melakukan tugas yang biasanya membutuhkan kecerdasan manusia, seperti memahami bahasa, mengenali gambar, dan menganalisis data.";
+    }
+
+    if (lower.includes("terima kasih")) {
+        return "Sama-sama! Senang bisa membantu. Ada hal lain yang ingin kamu diskusikan?";
+    }
+
+    return "Terima kasih atas pesanmu!\\n\\nIni adalah tampilan demo ChatGPT yang dibuat menggunakan HTML, CSS, dan JavaScript dalam satu file.\\n\\nUntuk mendapatkan jawaban AI sungguhan, website ini perlu dihubungkan ke backend dan API model AI.";
+}
+
+function sendMessage() {
+    const text = input.value.trim();
+
+    if (!text || isWaiting) return;
+
+    welcome.style.display = "none";
+
+    addMessage(text, "user");
+    chatHistory.push(text);
+
+    if (chatHistory.length === 1) {
+        addHistoryItem(text);
+    }
+
+    input.value = "";
+    input.style.height = "auto";
+    isWaiting = true;
+    sendBtn.disabled = true;
+
+    const typing = addMessage("Thinking...", "bot");
+
+    setTimeout(() => {
+        const content = typing.querySelector(".message-content");
+        content.textContent = generateResponse(text);
+
+        isWaiting = false;
+        sendBtn.disabled = false;
+
+        chatArea.scrollTop = chatArea.scrollHeight;
+        input.focus();
+    }, 900);
+}
+
+function addHistoryItem(text) {
+    const item = document.createElement("div");
+    item.className = "history-item";
+    item.textContent = text.length > 28
+        ? text.substring(0, 28) + "..."
+        : text;
+
+    item.title = text;
+    item.onclick = () => {
+        alert("Ini hanya contoh tampilan riwayat chat.");
+    };
+
+    document.getElementById("history").prepend(item);
+}
+
+function newChat() {
+    messages.innerHTML = "";
+    chatHistory = [];
+    welcome.style.display = "block";
+    input.value = "";
+    input.style.height = "auto";
+    input.focus();
+}
+</script>
 
 </body>
 </html>
