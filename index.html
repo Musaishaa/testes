@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Generator</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #101827, #243b55);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255,255,255,0.08);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #b8c5d6;
+            margin-bottom: 25px;
+        }
+
+        .result {
+            font-size: 35px;
+            font-weight: bold;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        button {
+            padding: 13px 25px;
+            border: none;
+            border-radius: 10px;
+            background: #38bdf8;
+            color: #102030;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #8da2bb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Random Generator</h1>
+        <p>Klik tombol untuk menghasilkan sesuatu secara acak!</p>
+
+        <div class="result" id="result">?</div>
+
+        <button onclick="randomNumber()">Random Angka</button>
+        <button onclick="randomColor()">Random Warna</button>
+        <button onclick="randomWord()">Random Kata</button>
+
+        <div class="footer">
+            Created with HTML, CSS & JavaScript
+        </div>
+    </div>
+
+    <script>
+        function randomNumber() {
+            let number = Math.floor(Math.random() * 1000) + 1;
+            document.getElementById("result").innerText = number;
+        }
+
+        function randomColor() {
+            let color = "#" + Math.floor(
+                Math.random() * 16777215
+            ).toString(16).padStart(6, "0");
+
+            document.getElementById("result").innerText = color;
+            document.querySelector(".container").style.background = color;
+        }
+
+        function randomWord() {
+            let words = [
+                "Ascendant",
+                "Sovereign",
+                "Eternal",
+                "Mystic",
+                "Legend",
+                "Infinity",
+                "Dominion",
+                "Imperium",
+                "Aeternum",
+                "Invictus"
+            ];
+
+            let word = words[Math.floor(Math.random() * words.length)];
+
+            document.getElementById("result").innerText = word;
+        }
+    </script>
+
+</body>
+</html>
